@@ -4,7 +4,7 @@ import routes from './routes';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import { useAuth } from './contexts/AuthContext';
-import SearchPage from './pages/SearchPage'; // Import SearchPage
+import SearchPage from './pages/SearchPage'; 
 
 function App() {
   const { user } = useAuth();
