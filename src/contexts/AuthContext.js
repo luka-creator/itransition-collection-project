@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
         alert("Your account has been deleted😔. Please contact support.");
       }
     } catch (error) {
-      if (error.code === 'auth/wrong-password') {
+      if (error.code === 'auth/invalid-credential') {
         alert("Incorrect password. Please try again.");
       } else if (error.code === 'auth/user-not-found') {
         alert("No user found with this email.");
@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  return (
+  return (  
     <AuthContext.Provider value={{ user, login, logout, register }}>
       {children}
     </AuthContext.Provider>
