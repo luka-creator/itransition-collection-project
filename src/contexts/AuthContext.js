@@ -65,7 +65,6 @@ export const AuthProvider = ({ children }) => {
         alert("No user found with this email.");
       } else {
         alert("this account does not exist or has been deleted");
-        console.error("Error logging in:", error);
       }
     }
   };
@@ -76,7 +75,6 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
     } catch (error) {
       alert("An error occurred during logout. Please try again.");
-      console.error("Error logging out:", error);
     }
   };
 
@@ -95,7 +93,6 @@ export const AuthProvider = ({ children }) => {
         alert("This email is already registered. Please log in.");
       } else {
         alert("An error occurred during registration. Please try again.");
-        console.error("Error registering:", error);
       }
     }
   };
