@@ -17,10 +17,8 @@ const addComment = async (data) => {
 
 const getCommentsByItemId = async (itemId) => {
     try {
-      console.log(`Fetching comments for itemId: ${itemId}`);
       const q = query(collection(firestore, 'comments'), where('itemId', '==', itemId), orderBy('createdAt', 'asc'));
       const snapshot = await getDocs(q);
-      console.log('Comments fetched:', snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
       console.error("Error getting comments:", error);
