@@ -28,6 +28,7 @@ const Header = () => {
     <Navbar expand="lg" className={isDarkMode ? 'navbar-dark bg-dark' : 'navbar-light bg-light'}>
       <Container>
         <Navbar.Brand as={Link} to="/">{t('home')}</Navbar.Brand>
+        <Link to="/create-ticket">Create support ticket</Link>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">

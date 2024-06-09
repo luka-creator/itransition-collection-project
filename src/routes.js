@@ -7,6 +7,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import SearchPage from './pages/SearchPage'; 
 import NotFoundPage from './pages/NotFoundPage';
+import CreateTicketPage from './pages/CreateTicketPage';
+import UserTicketsPage from './pages/UserTicketsPage';
 
 const routes = [
   { path: '/', component: Home, exact: true },
@@ -16,7 +18,9 @@ const routes = [
   { path: '/user', component: UserPage },
   { path: '/login', component: LoginPage },
   { path: '/register', component: RegisterPage },
-  { path: '/search', component: SearchPage }, 
+  { path: '/create-ticket', component: CreateTicketPage },
+  { path: '/user-tickets', component: UserTicketsPage },
+  { path: '/search', component: SearchPage },  
   { path: '*', component: NotFoundPage } 
 ];
 
