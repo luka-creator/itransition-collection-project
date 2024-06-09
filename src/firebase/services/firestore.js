@@ -1,5 +1,5 @@
 // src/firebase/services/firestore.js
-import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, limit, startAfter } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, query, where, orderBy, limit, startAfter, getDocs } from 'firebase/firestore';
 import { app } from '../config';
 
 const db = getFirestore(app);
@@ -13,18 +13,28 @@ export const useFirestore = () => {
     });
   };
 
-  const getUserTickets = async (userId, pageSize, lastDoc) => {
-    const ticketsQuery = query(
-      collection(db, 'tickets'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc'),
-      limit(pageSize),
-      startAfter(lastDoc || 0)
-    );
+  const getUserTickets = async (userId, pageSize = 10, lastDoc = null) => {
+    try {
+      let q = query(
+        collection(db, 'tickets'),
+        where('userId', '==', userId),
+        orderBy('createdAt', 'desc'),
+        limit(pageSize)
+      );
 
-    const ticketDocs = await getDocs(ticketsQuery);
-    const tickets = ticketDocs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    return { tickets, lastDoc: ticketDocs.docs[ticketDocs.docs.length - 1] };
+      if (lastDoc) {
+        q = query(q, startAfter(lastDoc));
+      }
+
+      const querySnapshot = await getDocs(q);
+      const tickets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+
+      return { tickets, lastDoc: lastVisible };
+    } catch (error) {
+      console.error("Error getting user tickets:", error);
+      throw error;
+    }
   };
 
   return { addTicket, getUserTickets };
