@@ -1,76 +1,90 @@
-// src/pages/CreateTicketPage.js
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { createJiraTicket } from '../firebase/services/jira';
-import { useFirestore } from '../firebase/services/firestore';
+import { useTranslation } from 'react-i18next';
+import { useFirestore as addTicketToFirestore } from '../firebase/services/firestore';
 
 const CreateTicketPage = () => {
   const { user } = useAuth();
-  const { addTicket } = useFirestore();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [summary, setSummary] = useState('');
   const [priority, setPriority] = useState('Medium');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError('');
-    setSuccess('');
 
     try {
-      const collectionName = ''; // Set this based on your context
-      const link = window.location.href;
+      if (!user || !user.email) {
+        setError(t('userNotAuthenticated'));
+        setLoading(false);
+        return;
+      }
 
-      const jiraResponse = await createJiraTicket(summary, priority, collectionName, link, user.email);
-      await addTicket({
+      const collectionName = location.state?.collectionName || 'N/A';
+      const link = location.pathname;
+
+      const jiraTicket = await createJiraTicket(summary, priority, collectionName, link, user.email);
+
+      await addTicketToFirestore({
         summary,
         priority,
         collectionName,
         link,
-        status: 'Opened',
+        jiraLink: `https://${process.env.REACT_APP_JIRA_DOMAIN}/browse/${jiraTicket.key}`,
+        status: jiraTicket.fields.status.name,
         userId: user.uid,
-        jiraLink: `https://${process.env.REACT_APP_JIRA_DOMAIN}/browse/${jiraResponse.key}`,
         createdAt: new Date(),
       });
 
-      setSuccess('Ticket created successfully');
-      setSummary('');
-      setPriority('Medium');
+      navigate('/tickets');
     } catch (err) {
       console.error('Error creating ticket:', err);
-      setError('Failed to create ticket. Please try again.');
+      setError(t('ticketCreationFailed'));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="container">
-      <h2>Create Ticket</h2>
+      <h2>{t('createTicket')}</h2>
       {error && <div className="alert alert-danger">{error}</div>}
-      {success && <div className="alert alert-success">{success}</div>}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={onSubmit}>
         <div className="form-group">
-          <label>Summary</label>
+          <label htmlFor="summary">{t('summary')}</label>
           <input
             type="text"
             className="form-control"
+            id="summary"
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
             required
           />
         </div>
         <div className="form-group">
-          <label>Priority</label>
+          <label htmlFor="priority">{t('priority')}</label>
           <select
             className="form-control"
+            id="priority"
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
+            required
           >
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
+            <option value="High">{t('high')}</option>
+            <option value="Medium">{t('medium')}</option>
+            <option value="Low">{t('low')}</option>
           </select>
         </div>
-        <button type="submit" className="btn btn-primary">Create Ticket</button>
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? t('loading') : t('createTicket')}
+        </button>
       </form>
     </div>
   );
