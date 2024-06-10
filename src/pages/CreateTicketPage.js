@@ -75,4 +75,5 @@ const CreateTicketPage = () => {
     </div>
   );
 };
+
 export default CreateTicketPage;

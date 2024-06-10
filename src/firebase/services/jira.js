@@ -2,6 +2,9 @@ import axios from 'axios';
 
 const createJiraTicket = async (summary, priority, collectionName, link, userEmail) => {
   try {
+    const authString = `${process.env.REACT_APP_JIRA_EMAIL}:${process.env.REACT_APP_JIRA_API_TOKEN}`;
+    const base64AuthString = btoa(authString);
+
     const response = await axios.post(
       `https://${process.env.REACT_APP_JIRA_DOMAIN}/rest/api/3/issue`,
       {
@@ -24,7 +27,7 @@ const createJiraTicket = async (summary, priority, collectionName, link, userEma
       },
       {
         headers: {
-          Authorization: `Basic ${btoa(`${process.env.REACT_APP_JIRA_EMAIL}:${process.env.REACT_APP_JIRA_API_TOKEN}`)}`,
+          Authorization: `Basic ${base64AuthString}`,
           'Content-Type': 'application/json',
         },
       }
