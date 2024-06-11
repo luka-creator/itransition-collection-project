@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const PROXY_SERVER_URL = "https://collectionapp-a928bf60f40f.herokuapp.com/";
+const PROXY_SERVER_URL = "https://collectionapp-a928bf60f40f.herokuapp.com";
 
 export const createJiraTicket = async (summary, priority, collectionName, link, userEmail) => {
   try {
