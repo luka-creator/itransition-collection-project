@@ -10,16 +10,20 @@ const UserTicketsPage = () => {
   const [loading, setLoading] = useState(false);
 
   const fetchTickets = useCallback(async () => {
+    if (!user) return; 
     setLoading(true);
     const { tickets: newTickets, lastDoc: newLastDoc } = await getUserTickets(user.uid, 10, lastDoc);
     setTickets(prevTickets => [...prevTickets, ...newTickets]);
     setLastDoc(newLastDoc);
     setLoading(false);
-  }, [getUserTickets, user.uid, lastDoc]);
-
+  }, [getUserTickets, user, lastDoc]); 
   useEffect(() => {
     fetchTickets();
   }, [fetchTickets]);
+
+  if (!user) {
+    return <div>Please log in to see your tickets.</div>; 
+  }
 
   return (
     <div>

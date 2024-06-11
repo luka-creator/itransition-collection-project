@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { createJiraTicket } from '../firebase/services/jira';
 import { useTranslation } from 'react-i18next';
-import { useFirestore as addTicketToFirestore } from '../firebase/services/firestore';
+import { useFirestore } from '../firebase/services/firestore';
 
 const CreateTicketPage = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const location = useLocation();
   const [summary, setSummary] = useState('');
   const [priority, setPriority] = useState('Medium');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const { addTicket: addTicketToFirestore } = useFirestore(); 
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -32,23 +31,15 @@ const CreateTicketPage = () => {
 
       const jiraTicket = await createJiraTicket(summary, priority, collectionName, link, user.email);
 
-      // Validate the jiraTicket object
-      if (!jiraTicket || !jiraTicket.key || !jiraTicket.fields || !jiraTicket.fields.status) {
-        throw new Error('Invalid response from proxy server');
-      }
-
-      await addTicketToFirestore({
+      await addTicketToFirestore(user.uid, { 
         summary,
         priority,
         collectionName,
         link,
         jiraLink: `https://${process.env.REACT_APP_JIRA_DOMAIN}/browse/${jiraTicket.key}`,
-        status: jiraTicket.fields.status.name,
-        userId: user.uid,
-        createdAt: new Date(),
+        createdAt: new Date(), 
       });
 
-      navigate('/tickets');
     } catch (err) {
       console.error('Error creating ticket:', err);
       setError(t('ticketCreationFailed'));
