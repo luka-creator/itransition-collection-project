@@ -32,6 +32,11 @@ const CreateTicketPage = () => {
 
       const jiraTicket = await createJiraTicket(summary, priority, collectionName, link, user.email);
 
+      // Validate the jiraTicket object
+      if (!jiraTicket || !jiraTicket.key || !jiraTicket.fields || !jiraTicket.fields.status) {
+        throw new Error('Invalid response from proxy server');
+      }
+
       await addTicketToFirestore({
         summary,
         priority,

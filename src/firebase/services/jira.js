@@ -12,12 +12,14 @@ export const createJiraTicket = async (summary, priority, collectionName, link, 
       userEmail,
     });
 
+    // Ensure response contains expected data structure
+    if (!response.data || !response.data.key || !response.data.fields || !response.data.fields.status) {
+      throw new Error('Invalid response from proxy server');
+    }
+
     return response.data;
   } catch (error) {
     console.error('Error creating Jira ticket:', error);
     throw new Error('Failed to create Jira ticket');
   }
 };
-
-
-
