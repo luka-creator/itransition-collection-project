@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import {  useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { createJiraTicket } from '../firebase/services/jira';
 import { useTranslation } from 'react-i18next';
-import { useFirestore } from '../firebase/services/firestore';
+import { useFirestore as addTicketToFirestore } from '../firebase/services/firestore';
 
 const CreateTicketPage = () => {
   const { user } = useAuth();
@@ -13,7 +13,7 @@ const CreateTicketPage = () => {
   const [priority, setPriority] = useState('Medium');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { addTicket: addTicketToFirestore } = useFirestore(); 
+
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -31,13 +31,14 @@ const CreateTicketPage = () => {
 
       const jiraTicket = await createJiraTicket(summary, priority, collectionName, link, user.email);
 
-      await addTicketToFirestore(user.uid, { 
+      await addTicketToFirestore({
         summary,
         priority,
         collectionName,
         link,
         jiraLink: `https://${process.env.REACT_APP_JIRA_DOMAIN}/browse/${jiraTicket.key}`,
-        createdAt: new Date(), 
+        userId: user.uid,
+        createdAt: new Date(),
       });
 
     } catch (err) {
